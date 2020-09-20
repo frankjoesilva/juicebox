@@ -8,6 +8,12 @@ const {
     getAllPosts,
     getUserById,
     getPostsByUser,
+    createTags,
+    getAllTags,
+    createPostTag,
+    addTagsToPost,
+    getPostById,
+    getPostsByTagName,
     
   } = require('./index');
   
@@ -16,6 +22,8 @@ const {
       console.log("Starting to drop tables...");
   
       await client.query(`
+      DROP TABLE IF EXISTS post_tags;
+      DROP TABLE IF EXISTS tags;
       DROP TABLE IF EXISTS posts;
         DROP TABLE IF EXISTS users;
       `);
@@ -46,6 +54,15 @@ const {
           content TEXT NOT NULL,
           active BOOLEAN DEFAULT true
         );
+        CREATE TABLE tags (
+          id SERIAL PRIMARY KEY,
+          name VARCHAR(255) UNIQUE NOT NULL
+        );
+        CREATE TABLE post_tags (
+          "postId" INTEGER REFERENCES posts(id),
+          "tagId" INTEGER REFERENCES tags(id),
+          UNIQUE ("postId", "tagId")
+        );
       `);
   
       console.log("Finished building tables!");
@@ -54,6 +71,7 @@ const {
       throw error;
     }
   }
+
 
   async function createInitialUsers() {
     try {
@@ -79,17 +97,20 @@ const {
       await createPost({
         authorId: albert.id,
         title: "First Post",
-        content: "This is my first post. I hope I love writing blogs as much as I love writing them."
+        content: "This is my first post. I hope I love writing blogs as much as I love writing them.",
+        tags: ["#happy", "#youcandoanything"]
       });
       await createPost({
         authorId: sandra.id,
         title: "First & Not The Last Post",
-        content: "Cats are cool."
+        content: "Cats are cool.",
+        tags: ["#happy", "#worst-day-ever"]
       })
       await createPost({
         authorId: glamgal.id,
         title: "Cool Post",
-        content: "I love carnitas."
+        content: "I love carnitas.",
+        tags: ["#happy", "#youcandoanything", "#canmandoeverything"]
       })
     } catch (error) {
       throw error;
@@ -105,7 +126,7 @@ const {
       await createTables();
       await createInitialUsers();
       await createInitialPosts();
-
+      
     } catch (error) {
       throw error;
     }
@@ -137,10 +158,20 @@ const {
         content: "Updated Content"
       });
       console.log("Result:", updatePostResult);
+
+      console.log("Calling updatePost on posts[1], only updating tags");
+      const updatePostTagsResult = await updatePost(posts[0].id, {
+        tags: ["#youcandoanything", "#redfish", "#bluefish"]
+      });
+      console.log("Result:", updatePostTagsResult);
       
       console.log('Calling getPostsByUser')
       const postByUser = await getPostsByUser(1)
       console.log(postByUser)
+
+      console.log("Calling getPostsByTagName with #happy");
+      const postsWithHappy = await getPostsByTagName("#happy");
+      console.log("Result:", postsWithHappy);
   
       console.log("Calling getUserById with 1");
       const albert = await getUserById(1);
