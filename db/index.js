@@ -135,9 +135,8 @@ async function getAllUsers() {
       try{
         const { rows } = await client.query(`
         SELECT * FROM tags
-        WHERE name
-        IN ($1, $2, $3);
         `)
+        return { rows }
       } catch(error){
         throw error
       }
