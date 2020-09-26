@@ -198,21 +198,37 @@ async function getAllUsers() {
       }
     }
 
-    async function getUserById(userId) {
-      try {
-        const { rows: [ user ] } = await client.query(`
-        SELECT id, username, name, location, active
-        FROM users
-        WHERE id=${ userId }
-        `);
-        if (!user) {
-          return null
-        } else {
-        user.posts = await getPostsByUser(userId);
-        delete user.password
-        return user;
+    
+async function getUserById(userId) {
+  try {
+    const { rows: [ user ] } = await client.query(`
+      SELECT id, username, name, location, active
+      FROM users
+      WHERE id=${ userId }
+    `);
+
+    if (!user) {
+      return null
     }
-      } catch (error){
+
+    user.posts = await getPostsByUser(userId);
+
+    return user;
+  } catch (error) {
+    throw error;
+  }
+}
+
+    async function getUserByUsername(username) {
+      try {
+        const { rows: [user] } = await client.query(`
+          SELECT *
+          FROM users
+          WHERE username=$1
+        `, [username]);
+    
+        return user;
+      } catch (error) {
         throw error;
       }
     }
@@ -300,5 +316,6 @@ async function getAllUsers() {
       addTagsToPost,
       getPostById,
       getPostsByTagName,
+      getUserByUsername,
     }
     
