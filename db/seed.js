@@ -98,7 +98,7 @@ const {
         authorId: albert.id,
         title: "First Post",
         content: "This is my first post. I hope I love writing blogs as much as I love writing them.",
-        tags: ["#happy", "#youcandoanything"]
+        tags: ["#beans", "#youcandoanything"]
       });
       await createPost({
         authorId: sandra.id,
@@ -110,7 +110,7 @@ const {
         authorId: glamgal.id,
         title: "Cool Post",
         content: "I love carnitas.",
-        tags: ["#happy", "#youcandoanything", "#canmandoeverything"]
+        tags: ["#cabbage", "#youcandoanything", "#canmandoeverything"]
       })
     } catch (error) {
       throw error;
